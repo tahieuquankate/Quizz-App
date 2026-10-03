@@ -5,18 +5,18 @@ import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 
 
 // ---------- 1. BẢNG MÀU: sửa ở đây là đổi cả app ----------
 const C = {
-  bg: '#F6F4FB', card: '#FFFFFF', text: '#1E1B2E', sub: '#6B6880', line: '#E4E0F0',
-  primary: '#5B3FD9', primarySoft: '#ECE8FB',
-  amber: '#FFB703', amberSoft: '#FFF3D1',
-  green: '#12A150', greenSoft: '#DDF5E7',
-  red: '#E5484D', redSoft: '#FDE6E7',
+  bg: '#F6F1E7', card: '#FBF8F2', text: '#1F2D30', sub: '#7A786F', line: '#E9E1D1',
+  primary: '#2A6672', primarySoft: '#DDEAE8',
+  amber: '#D9A55F', amberSoft: '#F6E8CF',
+  green: '#3E7D5C', greenSoft: '#E3EBDD',
+  red: '#D4554D', redSoft: '#F8E1DC',
 };
 
 // ---------- 2. DỮ LIỆU GIẢ (chỉ để dựng giao diện) ----------
 const EXAMS = [
   { id: 1, title: 'Kiểm tra 15 phút - Chương 2', subject: 'Lập trình hướng đối tượng', info: '10 câu • 15 phút', status: 'new', icon: '💻', tint: C.primarySoft, fg: C.primary },
-  { id: 2, title: 'Ôn tập giữa kỳ', subject: 'Cấu trúc dữ liệu', info: '20 câu • 30 phút', status: 'new', icon: '🌳', tint: '#E3EEFB', fg: '#1F5FA8' },
-  { id: 3, title: 'Trắc nghiệm SQL cơ bản', subject: 'Cơ sở dữ liệu', info: '15 câu • 20 phút', status: 'done', score: '8.5', icon: '🗄️', tint: C.greenSoft, fg: '#0B7A3C' },
+  { id: 2, title: 'Ôn tập giữa kỳ', subject: 'Cấu trúc dữ liệu', info: '20 câu • 30 phút', status: 'new', icon: '🌳', tint: '#F3E4C8', fg: '#8F5E1E' },
+  { id: 3, title: 'Trắc nghiệm SQL cơ bản', subject: 'Cơ sở dữ liệu', info: '15 câu • 20 phút', status: 'done', score: '8.5', icon: '🗄️', tint: C.greenSoft, fg: '#2F6B4B' },
 ];
 
 const TABS = [
@@ -55,7 +55,7 @@ function HomeScreen({ onStart }) {
             <TextInput
               style={s.input}
               placeholder="Ví dụ: AB12CD"
-              placeholderTextColor="#A9A5BD"
+              placeholderTextColor="#A8A599"
               value={code}
               onChangeText={setCode}
               autoCapitalize="characters"
@@ -95,7 +95,7 @@ function HomeScreen({ onStart }) {
               </View>
             ) : (
               <View style={[s.chip, { backgroundColor: C.amberSoft }]}>
-                <Text style={[s.chipText, { color: '#9A6700' }]}>Chưa làm</Text>
+                <Text style={[s.chipText, { color: '#8F5E1E' }]}>Chưa làm</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -156,7 +156,7 @@ function ExamScreen({ onSubmit, onBack }) {
           <View style={s.qTopRow}>
             <Text style={s.qNumber}>Câu {idx + 1}</Text>
             <TouchableOpacity onPress={() => setFlags({ ...flags, [idx]: !flags[idx] })}>
-              <Text style={[s.flagBtn, flags[idx] && { color: '#9A6700' }]}>
+              <Text style={[s.flagBtn, flags[idx] && { color: '#8F5E1E' }]}>
                 {flags[idx] ? '🚩 Đã đánh dấu' : '⚑ Đánh dấu xem lại'}
               </Text>
             </TouchableOpacity>
@@ -186,23 +186,28 @@ function ExamScreen({ onSubmit, onBack }) {
         })}
 
         {/* Khung phản hồi: hiện ngay sau khi chọn đáp án */}
-        {hasAnswered && (
-          <View style={[s.feedback, isCorrect ? s.feedbackRight : s.feedbackWrong]}>
-            <View style={[s.feedbackIcon, { backgroundColor: isCorrect ? C.green : C.red }]}>
-              <Text style={s.tickText}>{isCorrect ? '✓' : '✕'}</Text>
+        {hasAnswered && (isCorrect ? (
+          // Ô CHÍNH XÁC: khối mới, to và đậm
+          <View style={s.correctBox}>
+            <View style={s.correctIcon}>
+              <Text style={s.correctIconText}>✓</Text>
+            </View>
+            <Text style={s.correctTitle}>Chính xác!</Text>
+          </View>
+        ) : (
+          // Ô SAI RỒI: giữ nguyên như cũ
+          <View style={[s.feedback, s.feedbackWrong]}>
+            <View style={[s.feedbackIcon, { backgroundColor: C.red }]}>
+              <Text style={s.tickText}>✕</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[s.feedbackTitle, { color: isCorrect ? C.green : C.red }]}>
-                {isCorrect ? 'Chính xác!' : 'Sai rồi!'}
+              <Text style={[s.feedbackTitle, { color: C.red }]}>Sai rồi!</Text>
+              <Text style={s.feedbackText}>
+                Đáp án đúng là: {'ABCD'[q.correct]}. {q.options[q.correct]}.
               </Text>
-              {!isCorrect && (
-                <Text style={s.feedbackText}>
-                  Đáp án đúng là: {'ABCD'[q.correct]}. {q.options[q.correct]}.
-                </Text>
-              )}
             </View>
           </View>
-        )}
+        ))}
       </ScrollView>
 
       {/* Bảng chọn nhanh câu hỏi */}
@@ -213,7 +218,7 @@ function ExamScreen({ onSubmit, onBack }) {
             {QUESTIONS.map((_, i) => {
               let bg = C.bg, color = C.sub;
               if (answers[i] !== undefined) { bg = C.primarySoft; color = C.primary; }
-              if (flags[i]) { bg = C.amberSoft; color = '#9A6700'; }
+              if (flags[i]) { bg = C.amberSoft; color = '#8F5E1E'; }
               return (
                 <TouchableOpacity
                   key={i}
@@ -271,7 +276,36 @@ function ResultScreen({ answers, onHome }) {
       <View style={s.statsRow}>
         <View style={[s.statBox, { backgroundColor: C.greenSoft }]}><Text style={[s.statNum, { color: C.green }]}>{correct}</Text><Text style={s.statLabel}>Đúng</Text></View>
         <View style={[s.statBox, { backgroundColor: C.redSoft }]}><Text style={[s.statNum, { color: C.red }]}>{wrong}</Text><Text style={s.statLabel}>Sai</Text></View>
-        <View style={[s.statBox, { backgroundColor: C.amberSoft }]}><Text style={[s.statNum, { color: '#9A6700' }]}>{skipped}</Text><Text style={s.statLabel}>Bỏ qua</Text></View>
+        <View style={[s.statBox, { backgroundColor: C.amberSoft }]}><Text style={[s.statNum, { color: '#8F5E1E' }]}>{skipped}</Text><Text style={s.statLabel}>Bỏ qua</Text></View>
+      </View>
+
+      {/* Chi tiết từng câu */}
+      <View style={{ alignSelf: 'stretch' }}>
+        <Text style={s.detailTitle}>Chi tiết kết quả</Text>
+        {QUESTIONS.map((q, i) => {
+          const chosen = answers[i];
+          const status = chosen === undefined ? 'skip' : chosen === q.correct ? 'right' : 'wrong';
+          const info = {
+            right: { label: 'Đúng', color: C.green, mark: '✓', ans: 'Đáp án' },
+            wrong: { label: 'Sai', color: C.red, mark: '✕', ans: 'Đáp án đúng' },
+            skip: { label: 'Bỏ qua', color: '#8F5E1E', mark: '–', ans: 'Đáp án' },
+          }[status];
+          return (
+            <View key={i} style={s.detailRow}>
+              <Text style={s.detailNum}>{i + 1}</Text>
+              <Text style={s.detailQ}>{q.q}</Text>
+              <View style={s.detailRight}>
+                <View style={s.detailBadge}>
+                  <View style={[s.detailMark, { backgroundColor: info.color }]}>
+                    <Text style={s.detailMarkText}>{info.mark}</Text>
+                  </View>
+                  <Text style={[s.detailLabel, { color: info.color }]}>{info.label}</Text>
+                </View>
+                <Text style={s.detailAns}>{info.ans}: {'ABCD'[q.correct]}</Text>
+              </View>
+            </View>
+          );
+        })}
       </View>
 
       <TouchableOpacity style={[s.mainBtn, { alignSelf: 'stretch', marginTop: 24, paddingVertical: 16 }]} onPress={onHome}>
@@ -304,13 +338,13 @@ export default function App() {
 const s = StyleSheet.create({
   // Trang chủ
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  logo: { fontSize: 28, fontWeight: '800', color: '#3C2A9E' },
+  logo: { fontSize: 28, fontWeight: '800', color: '#1F5560' },
   avatar: { width: 38, height: 38, borderRadius: 19, backgroundColor: C.primary, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#fff', fontWeight: '800', fontSize: 15 },
   helloSub: { fontSize: 15, color: C.sub, marginTop: 4 },
   joinBox: { backgroundColor: C.primary, borderRadius: 18, padding: 18, marginTop: 18 },
   joinTitle: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  joinSub: { color: '#D9D2F7', fontSize: 13, marginTop: 2, marginBottom: 12 },
+  joinSub: { color: '#D3E4E2', fontSize: 13, marginTop: 2, marginBottom: 12 },
   joinRow: { flexDirection: 'row', gap: 8 },
   input: { flex: 1, backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15 },
   joinBtn: { backgroundColor: C.amber, borderRadius: 12, paddingHorizontal: 18, justifyContent: 'center' },
@@ -358,11 +392,15 @@ const s = StyleSheet.create({
   tick: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
   tickText: { color: '#fff', fontWeight: '800', fontSize: 13 },
   feedback: { flexDirection: 'row', alignItems: 'flex-start', borderRadius: 14, padding: 14, marginTop: 6, borderWidth: 1 },
-  feedbackWrong: { backgroundColor: C.redSoft, borderColor: '#F5B5B8' },
-  feedbackRight: { backgroundColor: C.greenSoft, borderColor: '#A8E0BF' },
+  feedbackWrong: { backgroundColor: C.redSoft, borderColor: '#EBBDB5' },
+  feedbackRight: { backgroundColor: C.greenSoft, borderColor: '#BFD3B8' },
   feedbackIcon: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   feedbackTitle: { fontSize: 17, fontWeight: '800' },
   feedbackText: { fontSize: 14, color: C.text, marginTop: 4, lineHeight: 20 },
+  correctBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#2F6B4B', borderRadius: 18, paddingVertical: 22, paddingHorizontal: 20, marginTop: 14, elevation: 4 },
+  correctIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', marginRight: 14 },
+  correctIconText: { fontSize: 24, fontWeight: '800', color: '#2F6B4B' },
+  correctTitle: { fontSize: 24, fontWeight: '800', color: '#fff' },
   bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, flexDirection: 'row', gap: 10, padding: 16, paddingBottom: 28, backgroundColor: C.card, borderTopWidth: 1, borderTopColor: C.line },
   ghostBtn: { width: 48, borderRadius: 12, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' },
   ghostText: { fontSize: 24, color: C.sub },
@@ -383,4 +421,14 @@ const s = StyleSheet.create({
   scoreNum: { fontSize: 52, fontWeight: '800', color: C.primary },
   scoreMax: { fontSize: 14, color: C.sub },
   resultTitle: { fontSize: 20, fontWeight: '800', color: C.text, marginTop: 20 },
+  detailTitle: { fontSize: 18, fontWeight: '700', color: C.text, marginTop: 26, marginBottom: 12 },
+  detailRow: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: C.card, borderRadius: 12, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: C.line },
+  detailNum: { width: 22, fontSize: 16, fontWeight: '800', color: C.text },
+  detailQ: { flex: 1, fontSize: 13, color: C.text, lineHeight: 19, paddingRight: 10 },
+  detailRight: { alignItems: 'flex-end' },
+  detailBadge: { flexDirection: 'row', alignItems: 'center' },
+  detailMark: { width: 18, height: 18, borderRadius: 9, alignItems: 'center', justifyContent: 'center', marginRight: 6 },
+  detailMarkText: { color: '#fff', fontWeight: '800', fontSize: 11 },
+  detailLabel: { fontSize: 13, fontWeight: '700' },
+  detailAns: { fontSize: 11, color: C.sub, marginTop: 6 },
 });
